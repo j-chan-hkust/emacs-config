@@ -1,0 +1,88 @@
+;; Setup use-package just in case everything isn't already installed
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+;; Enable use-package
+(eval-when-compile
+  (require 'use-package))
+(setq use-package-always-ensure t)
+(use-package org
+  :pin gnu)
+
+;; Must do this so the agenda knows where to look for my files
+(setq org-agenda-files '("/Users/jungchan/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/"))
+
+;; Configure refile targets
+(setq org-refile-targets '(
+                           ("todo.org" :maxlevel . 3)
+                           ("thoughts.org" :maxlevel . 3)
+                           ("questions.org" :maxlevel . 3)
+                           ("trash.org" :maxlevel . 3)
+                           (org-agenda-files :maxlevel . 3)))
+
+;; Allow refile to create parent tasks with confirmation
+(setq org-refile-allow-creating-parent-nodes 'confirm)
+
+;; When a TODO is set to a done state, record a timestamp
+(setq org-log-done 'time)
+
+;; Follow the links
+(setq org-return-follows-link  t)
+
+;; Associate all org files with org mode
+(add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
+
+;; Make the indentation look nicer
+(add-hook 'org-mode-hook 'org-indent-mode)
+
+;; Remap the change priority keys to use the UP or DOWN key
+(define-key org-mode-map (kbd "C-c <up>") 'org-priority-up)
+(define-key org-mode-map (kbd "C-c <down>") 'org-priority-down)
+
+;; Shortcuts for storing links, viewing the agenda, and starting a capture
+(define-key global-map "\C-cl" 'org-store-link)
+(define-key global-map "\C-ca" 'org-agenda)
+(define-key global-map "\C-cc" 'org-capture)
+
+;; When you want to change the level of an org item, use SMR
+(define-key org-mode-map (kbd "C-c C-g C-r") 'org-shiftmetaright)
+
+;; Hide the markers so you just see bold text as BOLD-TEXT and not *BOLD-TEXT*
+(setq org-hide-emphasis-markers t)
+
+;; Wrap the lines in org mode so that things are easier to read
+(add-hook 'org-mode-hook 'visual-line-mode)
+
+(setq org-capture-templates
+      '(
+        ("n" "Note"
+         entry (file+headline "/Users/jungchan/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/notes.org" "Notes")
+         "** %?"
+         :empty-lines 0)
+        ))
+
+;; Auto-reload notes.org when it changes on disk
+(add-hook 'find-file-hook
+          (lambda ()
+            (when (and buffer-file-name
+                       (string-match-p "notes\\.org$" buffer-file-name))
+              (auto-revert-mode 1))))
+
+;; Tags
+(setq org-tag-alist '(
+                      ;; Contexts
+                      (:startgroup . nil)
+                      ("@work" . ?w)
+                      ("@personal" . ?p)                    
+                      (:endgroup . nil)
+		      ))
+
+;; Tag colors
+(setq org-tag-faces
+      '(
+        ("work"  . (:foreground "royalblue1" :weight bold))
+        ("personal"   . (:foreground "sienna"    :weight bold))
+        ))
+
+(find-file "/Users/jungchan/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/")
