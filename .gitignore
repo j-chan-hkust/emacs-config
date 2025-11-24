@@ -1,4 +1,6 @@
 auto-save-list/*
 bookmarks
+bookmarks~
 init.el~
 .DS_Store
+url/*

@@ -10,8 +10,14 @@
 (use-package org
   :pin gnu)
 
+;; open emacs in full screen
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+
 ;; Must do this so the agenda knows where to look for my files
 (setq org-agenda-files '("/Users/jungchan/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/"))
+
+;; Agenda always takes over current window
+(setq org-agenda-window-setup 'only-window)
 
 ;; Configure refile targets
 (setq org-refile-targets '(
@@ -86,3 +92,11 @@
         ))
 
 (find-file "/Users/jungchan/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/")
+
+;; Set a specific location for archived tasks
+(setq org-archive-location "/Users/jungchan/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/archive.org::* Archived Tasks")
+
+;; Todo States - "@" means prompt for a note upon entering the state, "!" means make a timestamp when you enter the state, "/!" means make a timestamp when leaving the state
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "WAITING(w@/!)" "|" "DONE(d!)" "CANCELLED(c@!)" )
+        ))
