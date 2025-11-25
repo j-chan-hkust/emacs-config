@@ -100,3 +100,42 @@
 (setq org-todo-keywords
       '((sequence "TODO(t)" "WAITING(w@/!)" "|" "DONE(d!)" "CANCELLED(c@!)" )
         ))
+
+;; TODO colors
+(setq org-todo-keyword-faces
+      '(
+        ("TODO" . (:foreground "firebrick3" :weight bold))
+        ("WAITING" . (:foreground "DarkOrange2" :weight bold))
+        ("DONE" . (:foreground "forest green" :weight bold))
+        ("CANCELLED" . (:foreground "slate gray" :weight bold))
+        ))
+
+
+;; === AUTO-SAVE: Constantly save changes to disk ===
+;; Auto-save visited files every 10 seconds of idle time
+(auto-save-visited-mode 10)
+(setq auto-save-visited-interval 10)  ; Very frequent saves for iCloud sync
+
+;; Also save all org buffers after agenda operations
+(defun my/save-all-org-buffers (&rest _)
+  "Save all org-mode buffers without prompting."
+  (save-some-buffers t (lambda () (derived-mode-p 'org-mode))))
+
+(add-hook 'org-agenda-after-show-hook #'my/save-all-org-buffers)
+(advice-add 'org-agenda-todo :after #'my/save-all-org-buffers)
+(advice-add 'org-agenda-priority :after #'my/save-all-org-buffers)
+(advice-add 'org-agenda-set-tags :after #'my/save-all-org-buffers)
+(advice-add 'org-agenda-schedule :after #'my/save-all-org-buffers)
+(advice-add 'org-agenda-deadline :after #'my/save-all-org-buffers)
+(advice-add 'org-agenda-refile :after #'my/save-all-org-buffers)
+
+;; === AUTO-REVERT: Reload files when they change on disk ===
+;; Enable global auto-revert for all buffers
+(global-auto-revert-mode 5)
+
+;; Make auto-revert very responsive for org files
+(setq auto-revert-interval 5)  ; Check every 5 seconds
+(setq auto-revert-check-vc-info nil)  ; Skip VC checks (i.e. git stuff) for performance
+
+;; Also revert non-file buffers like dired
+(setq global-auto-revert-non-file-buffers t)
