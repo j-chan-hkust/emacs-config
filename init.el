@@ -151,3 +151,22 @@
 ;; turning on line highlighting, and defining custom color
 (global-hl-line-mode 1)
 (set-face-background 'hl-line "azure1")
+
+;; custom refile function to move todos to todo.org 
+(defun refile-todos-to-todo-file ()
+  "Refile all TODO items from current buffer to todo.org under 'todos' heading."
+  (interactive)
+  (unless (file-exists-p "/Users/jungchan/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/todo.org")
+    (error "Target file todo.org not found! Update the path in this function"))
+  (let ((org-refile-targets '(("/Users/jungchan/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/todo.org" :regexp . "^\\*+ Todos\\>")))
+        (count 0))
+    (save-excursion
+      (while (progn
+               (goto-char (point-min))
+               (re-search-forward "^\\*+ TODO " nil t))
+        (forward-line 0)  ; Ensure we're at headline start
+        (org-refile nil nil (org-refile-get-location))
+        (cl-incf count)))
+    (message "Successfully refiled %d TODO items!" count)))
+
+(global-set-key (kbd "C-c r") 'refile-todos-to-todo-file)
