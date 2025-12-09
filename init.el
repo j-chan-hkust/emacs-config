@@ -140,3 +140,8 @@
 
 ;; Also revert non-file buffers like dired
 (setq global-auto-revert-non-file-buffers t)
+
+;; custom agendas
+(setq org-agenda-custom-commands
+      '(("w" "Work Tasks" ((agenda "") (tags-todo "-@personal")))
+        ("p" "Personal Tasks" ((agenda "") (tags-todo "-@work")))))
