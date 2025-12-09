@@ -170,3 +170,6 @@
     (message "Successfully refiled %d TODO items!" count)))
 
 (global-set-key (kbd "C-c r") 'refile-todos-to-todo-file)
+
+;; show indenting in agenda view
+(setq org-tags-match-list-sublevels 'indented)
