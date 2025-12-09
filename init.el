@@ -147,3 +147,7 @@
 (setq org-agenda-custom-commands
       '(("w" "Work Tasks" ((agenda "") (tags-todo "-@personal")))
         ("p" "Personal Tasks" ((agenda "") (tags-todo "-@work")))))
+
+;; turning on line highlighting, and defining custom color
+(global-hl-line-mode 1)
+(set-face-background 'hl-line "azure1")
