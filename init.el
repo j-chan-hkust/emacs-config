@@ -61,6 +61,8 @@
 ;; Wrap the lines in org mode so that things are easier to read
 (add-hook 'org-mode-hook 'visual-line-mode)
 
+(set-face-attribute 'default nil :height 130)
+
 (setq org-capture-templates
       '(
         ("n" "Note"
