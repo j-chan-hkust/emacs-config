@@ -14,7 +14,8 @@
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
 ;; Must do this so the agenda knows where to look for my files
-(setq org-agenda-files '("/Users/jungchan/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/"))
+(setq org-agenda-files '("/Users/jungchan/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/"
+			 "/Users/jungchan/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/projects"))
 
 ;; Agenda always takes over current window
 (setq org-agenda-window-setup 'only-window)
