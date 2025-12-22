@@ -162,8 +162,16 @@
 
 ;; custom agendas
 (setq org-agenda-custom-commands
-      '(("w" "Work Tasks" ((agenda "") (tags-todo "-@personal")))
-        ("p" "Personal Tasks" ((agenda "") (tags-todo "-@work")))))
+      '(("w" "Work Tasks"
+         ((agenda ""
+                  ((org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp ":@personal:"))))
+          (tags-todo "-@personal"
+                     ((org-agenda-skip-function '(org-agenda-skip-entry-if 'scheduled))))))
+        ("p" "Personal Tasks"
+         ((agenda ""
+                  ((org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp ":@work:"))))
+          (tags-todo "-@work"
+                     ((org-agenda-skip-function '(org-agenda-skip-entry-if 'scheduled))))))))
 
 ;; turning on line highlighting, and defining custom color
 (global-hl-line-mode 1)
