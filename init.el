@@ -194,3 +194,5 @@
 
 ;; show indenting in agenda view
 (setq org-tags-match-list-sublevels 'indented)
+
+(cd "/Users/jungchan/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/")
