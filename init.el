@@ -10,6 +10,29 @@
 (use-package org
   :pin gnu)
 
+;; Setup org-superstar
+(unless (package-installed-p 'org-superstar)
+  (package-refresh-contents)
+  (package-install 'org-superstar))
+
+(eval-when-compile
+  (require 'org-superstar))
+
+(add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
+
+(load-theme 'modus-operandi :no-confirm)
+
+(set-face-attribute 'default nil :height 130)
+
+(custom-set-faces
+  '(org-level-1 ((t (:inherit outline-1 :height 1.2))))
+  '(org-level-2 ((t (:inherit outline-2 :height 1.15))))
+  '(org-level-3 ((t (:inherit outline-3 :height 1.1))))
+  '(org-level-4 ((t (:inherit outline-4 :height 1.05))))
+  '(org-level-5 ((t (:inherit outline-5 :height 1.0))))
+  (set-face-attribute 'default nil :height 130)
+)
+
 ;; open emacs in full screen
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
@@ -60,8 +83,6 @@
 
 ;; Wrap the lines in org mode so that things are easier to read
 (add-hook 'org-mode-hook 'visual-line-mode)
-
-(set-face-attribute 'default nil :height 130)
 
 (setq org-capture-templates
       '(
