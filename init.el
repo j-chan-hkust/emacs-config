@@ -1,3 +1,6 @@
+;; Set working directory to org-mode files location
+(cd "/Users/jungchan/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/")
+
 ;; Setup use-package just in case everything isn't already installed
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -33,8 +36,8 @@
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
 ;; Must do this so the agenda knows where to look for my files
-(setq org-agenda-files '("/Users/jungchan/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/"
-			 "/Users/jungchan/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/projects"))
+(setq org-agenda-files '("."
+			 "projects"))
 
 ;; Agenda always takes over current window
 (setq org-agenda-window-setup 'only-window)
@@ -83,7 +86,7 @@
 (setq org-capture-templates
       '(
         ("n" "Note"
-         entry (file+headline "/Users/jungchan/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/notes.org" "Notes")
+         entry (file+headline "notes.org" "Notes")
          "** %?"
          :empty-lines 0)
         ))
@@ -111,10 +114,10 @@
         ("personal"   . (:foreground "sienna"    :weight bold))
         ))
 
-(find-file "/Users/jungchan/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/")
+(find-file ".")
 
 ;; Set a specific location for archived tasks
-(setq org-archive-location "/Users/jungchan/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/archive/archive.org::* Archived Tasks")
+(setq org-archive-location "archive/archive.org::* Archived Tasks")
 
 ;; Todo States - "@" means prompt for a note upon entering the state, "!" means make a timestamp when you enter the state, "/!" means make a timestamp when leaving the state
 (setq org-todo-keywords
@@ -177,13 +180,13 @@
 (global-hl-line-mode 1)
 (set-face-background 'hl-line "azure1")
 
-;; custom refile function to move todos to todo.org 
+;; custom refile function to move todos to todo.org
 (defun refile-todos-to-todo-file ()
   "Refile all TODO items from current buffer to todo.org under 'todos' heading."
   (interactive)
-  (unless (file-exists-p "/Users/jungchan/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/todo.org")
+  (unless (file-exists-p "todo.org")
     (error "Target file todo.org not found! Update the path in this function"))
-  (let ((org-refile-targets '(("/Users/jungchan/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/todo.org" :regexp . "^\\*+ Todos\\>")))
+  (let ((org-refile-targets '(("todo.org" :regexp . "^\\*+ Todos\\>")))
         (count 0))
     (save-excursion
       (while (progn
@@ -198,5 +201,3 @@
 
 ;; show indenting in agenda view
 (setq org-tags-match-list-sublevels 'indented)
-
-(cd "/Users/jungchan/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/")
