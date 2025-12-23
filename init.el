@@ -114,7 +114,7 @@
 (find-file "/Users/jungchan/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/")
 
 ;; Set a specific location for archived tasks
-(setq org-archive-location "/Users/jungchan/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/archive.org::* Archived Tasks")
+(setq org-archive-location "/Users/jungchan/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/archive/archive.org::* Archived Tasks")
 
 ;; Todo States - "@" means prompt for a note upon entering the state, "!" means make a timestamp when you enter the state, "/!" means make a timestamp when leaving the state
 (setq org-todo-keywords
