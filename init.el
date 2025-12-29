@@ -240,8 +240,23 @@
 
 (global-set-key (kbd "s-SPC") 'quick-note)
 
-;; show indenting in agenda view
-(setq org-tags-match-list-sublevels 'indented)
+;; Custom function to create pipe-based indentation
+(defun my/org-agenda-prefix-with-pipes ()
+  "Generate prefix with pipe characters for indentation based on outline level."
+  (let* ((level (org-current-level))
+         (base-level (or (org-get-outline-path t) 1))
+         (indent-level (if level (1- level) 0)))
+    (if (> indent-level 0)
+        (concat (make-string (* indent-level 2) ?\s) "∟")
+      "")))
+
+;; Set custom prefix format for agenda views
+(setq org-agenda-prefix-format
+      '((agenda . " %i %-12:c%?-12t% s")
+        (todo . " %i %-12:c")
+        (tags . " %i %-12:c%(my/org-agenda-prefix-with-pipes)")
+        (search . " %i %-12:c")))
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
