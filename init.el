@@ -1,3 +1,10 @@
+;; Initialize package sources
+(require 'package)
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                         ("org" . "https://orgmode.org/elpa/")
+                         ("gnu" . "https://elpa.gnu.org/packages/")))
+(package-initialize)
+
 ;; Set working directory to org-mode files location
 (cd "/Users/jungchan/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/")
 
@@ -31,6 +38,15 @@
          ("C-M-$" . jinx-languages))
   :config
   (setq jinx-languages "en_US"))
+
+(unless (package-installed-p 'olivetti)
+  (package-refresh-contents)
+  (package-install 'olivetti))
+
+(use-package olivetti
+  :bind ("C-c o" . olivetti-mode))
+
+(add-hook 'olivetti-mode-on-hook (lambda () (olivetti-set-width 100)))
 
 (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
 
