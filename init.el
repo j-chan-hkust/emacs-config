@@ -21,16 +21,32 @@
 (eval-when-compile
   (require 'org-superstar))
 
+(unless (package-installed-p 'jinx)
+  (package-refresh-contents)
+  (package-install 'jinx))
+
+(use-package jinx
+  :hook (emacs-startup . global-jinx-mode)
+  :bind (("M-$"   . jinx-correct)
+         ("C-M-$" . jinx-languages))
+  :config
+  (setq jinx-languages "en_US"))
+
 (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
 
+;; Set default font
+(set-face-attribute 'default nil :font "Menlo-14")
+
 (custom-set-faces
-  '(org-level-1 ((t (:inherit outline-1 :height 1.2))))
-  '(org-level-2 ((t (:inherit outline-2 :height 1.15))))
-  '(org-level-3 ((t (:inherit outline-3 :height 1.1))))
-  '(org-level-4 ((t (:inherit outline-4 :height 1.05))))
-  '(org-level-5 ((t (:inherit outline-5 :height 1.0))))
-  (set-face-attribute 'default nil :height 130)
-)
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(org-level-1 ((t (:inherit outline-1 :height 1.2))))
+ '(org-level-2 ((t (:inherit outline-2 :height 1.15))))
+ '(org-level-3 ((t (:inherit outline-3 :height 1.1))))
+ '(org-level-4 ((t (:inherit outline-4 :height 1.05))))
+ '(org-level-5 ((t (:inherit outline-5 :height 1.0)))))
 
 ;; open emacs in full screen
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
@@ -69,10 +85,8 @@
 (define-key org-mode-map (kbd "C-c <up>") 'org-priority-up)
 (define-key org-mode-map (kbd "C-c <down>") 'org-priority-down)
 
-;; Shortcuts for storing links, viewing the agenda, and starting a capture
-(define-key global-map "\C-cl" 'org-store-link)
+;; Shortcuts for viewing the agenda
 (define-key global-map "\C-ca" 'org-agenda)
-(define-key global-map "\C-cc" 'org-capture)
 
 ;; When you want to change the level of an org item, use SMR
 (define-key org-mode-map (kbd "C-c C-g C-r") 'org-shiftmetaright)
@@ -82,21 +96,6 @@
 
 ;; Wrap the lines in org mode so that things are easier to read
 (add-hook 'org-mode-hook 'visual-line-mode)
-
-(setq org-capture-templates
-      '(
-        ("n" "Note"
-         entry (file+headline "notes.org" "Notes")
-         "** %?"
-         :empty-lines 0)
-        ))
-
-;; Auto-reload notes.org when it changes on disk
-(add-hook 'find-file-hook
-          (lambda ()
-            (when (and buffer-file-name
-                       (string-match-p "notes\\.org$" buffer-file-name))
-              (auto-revert-mode 1))))
 
 ;; Tags
 (setq org-tag-alist '(
@@ -163,16 +162,32 @@
 ;; Also revert non-file buffers like dired
 (setq global-auto-revert-non-file-buffers t)
 
+;; custom skip function that checks inherited tags
+(defun my/skip-if-has-tag (tag)
+  "Skip entries that have TAG (including inherited tags)."
+  (let ((tags (org-get-tags)))
+    (when (member tag tags)
+      (or (outline-next-heading)
+          (point-max)))))
+
+(defun my/skip-if-has-work-tag ()
+  "Skip entries tagged with @work (including inherited)."
+  (my/skip-if-has-tag "@work"))
+
+(defun my/skip-if-has-personal-tag ()
+  "Skip entries tagged with @personal (including inherited)."
+  (my/skip-if-has-tag "@personal"))
+
 ;; custom agendas
 (setq org-agenda-custom-commands
       '(("w" "Work Tasks"
          ((agenda ""
-                  ((org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp ":@personal:"))))
+                  ((org-agenda-skip-function 'my/skip-if-has-personal-tag)))
           (tags-todo "-@personal"
                      ((org-agenda-skip-function '(org-agenda-skip-entry-if 'scheduled))))))
         ("p" "Personal Tasks"
          ((agenda ""
-                  ((org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp ":@work:"))))
+                  ((org-agenda-skip-function 'my/skip-if-has-work-tag)))
           (tags-todo "-@work"
                      ((org-agenda-skip-function '(org-agenda-skip-entry-if 'scheduled))))))))
 
@@ -199,5 +214,21 @@
 
 (global-set-key (kbd "C-c r") 'refile-todos-to-todo-file)
 
+;; custom function to quickly add notes
+(defun quick-note ()
+  "Open notes.org, create a newline, and insert **."
+  (interactive)
+  (find-file "./notes.org")
+  (goto-char (point-max))
+  (insert "\n** "))
+
+(global-set-key (kbd "s-SPC") 'quick-note)
+
 ;; show indenting in agenda view
 (setq org-tags-match-list-sublevels 'indented)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages nil))
