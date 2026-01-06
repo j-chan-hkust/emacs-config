@@ -88,6 +88,16 @@
 ;; When a TODO is set to a done state, record a timestamp
 (setq org-log-done 'time)
 
+;; Automatically schedule tasks for today when marked as DONE or CANCELLED
+(defun my/schedule-task-on-completion ()
+  "Schedule task for today when it's marked as DONE or CANCELLED.
+Skip recurring tasks (those with repeaters)."
+  (when (and (member org-state '("DONE" "CANCELLED"))
+             (not (org-get-repeat)))
+    (org-schedule nil (format-time-string "%Y-%m-%d"))))
+
+(add-hook 'org-after-todo-state-change-hook 'my/schedule-task-on-completion)
+
 ;; Follow the links
 (setq org-return-follows-link  t)
 
