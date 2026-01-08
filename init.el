@@ -74,6 +74,9 @@
 ;; Agenda always takes over current window
 (setq org-agenda-window-setup 'only-window)
 
+;; Delete text that is selected when copy pasting/typing
+(delete-selection-mode 1)
+
 ;; Configure refile targets
 (setq org-refile-targets '(
                            ("todo.org" :maxlevel . 3)
