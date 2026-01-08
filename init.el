@@ -51,7 +51,7 @@
 (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
 
 ;; Set default font
-(set-face-attribute 'default nil :font "Menlo-14")
+(set-face-attribute 'default nil :font "Iosevka-14")
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
