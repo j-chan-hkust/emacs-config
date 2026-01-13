@@ -5,3 +5,6 @@ init.el~
 .DS_Store
 url/*
 elpa/
+local-config.el
+config.el
+config.elc

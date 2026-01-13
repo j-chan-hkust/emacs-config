@@ -1,0 +1,480 @@
+#+TITLE: Emacs Configuration
+#+AUTHOR: jungchan
+#+PROPERTY: header-args :tangle config.el :results silent
+
+* About
+
+This is a literate Emacs configuration using org-babel-tangle. The configuration is written in org-mode format with embedded code blocks that are "tangled" into an executable =config.el= file.
+
+* Setup & Tangling
+
+Auto-tangle this file when saving to automatically regenerate =config.el=.
+
+#+begin_src emacs-lisp
+;; Auto-tangle configuration on save
+(defun tangle-init ()
+  "When this file is saved, tangle it and byte-compile the result."
+  (when (equal (buffer-file-name)
+               (expand-file-name "init.org" user-emacs-directory))
+    (let ((prog-mode-hook nil))
+      (org-babel-tangle)
+      (byte-compile-file (expand-file-name "config.el" user-emacs-directory)))))
+
+(add-hook 'after-save-hook 'tangle-init)
+#+end_src
+
+* Local Configuration
+
+Machine-specific settings are loaded from =local-config.el= in the bootstrap =init.el= file BEFORE this configuration loads. This ensures the working directory and org-agenda-files are set first.
+
+See =local-config.el.example= for setup instructions.
+
+* Package Management
+
+Initialize package sources and set up use-package for declarative package management.
+
+#+begin_src emacs-lisp
+;; Initialize package sources
+(require 'package)
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                         ("org" . "https://orgmode.org/elpa/")
+                         ("gnu" . "https://elpa.gnu.org/packages/")))
+(package-initialize)
+
+;; Setup use-package just in case everything isn't already installed
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+;; Enable use-package
+(eval-when-compile
+  (require 'use-package))
+(setq use-package-always-ensure t)
+(use-package org
+  :pin gnu)
+#+end_src
+
+** org-superstar
+
+#+begin_src emacs-lisp
+;; Setup org-superstar
+(unless (package-installed-p 'org-superstar)
+  (package-refresh-contents)
+  (package-install 'org-superstar))
+
+(eval-when-compile
+  (require 'org-superstar))
+
+(add-hook 'org-mode-hook (lambda () (org-superstar-mode 1)))
+#+end_src
+
+** jinx
+
+#+begin_src emacs-lisp
+(unless (package-installed-p 'jinx)
+  (package-refresh-contents)
+  (package-install 'jinx))
+
+(use-package jinx
+  :hook (emacs-startup . global-jinx-mode)
+  :bind (("M-$"   . jinx-correct)
+         ("C-M-$" . jinx-languages))
+  :config
+  (setq jinx-languages "en_US"))
+#+end_src
+
+** olivetti
+
+#+begin_src emacs-lisp
+(unless (package-installed-p 'olivetti)
+  (package-refresh-contents)
+  (package-install 'olivetti))
+
+(use-package olivetti
+  :bind ("C-c o" . olivetti-mode))
+
+(add-hook 'olivetti-mode-on-hook (lambda () (olivetti-set-width 100)))
+#+end_src
+
+* Visuals
+
+** Fonts
+
+Set default font
+
+#+begin_src emacs-lisp
+(set-face-attribute 'default nil :font "Iosevka-14")
+#+end_src
+
+** Org Heading Sizes
+
+#+begin_src emacs-lisp
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(org-level-1 ((t (:inherit outline-1 :height 1.2))))
+ '(org-level-2 ((t (:inherit outline-2 :height 1.15))))
+ '(org-level-3 ((t (:inherit outline-3 :height 1.1))))
+ '(org-level-4 ((t (:inherit outline-4 :height 1.05))))
+ '(org-level-5 ((t (:inherit outline-5 :height 1.0)))))
+#+end_src
+
+** Window & Display
+
+Open emacs in full screen
+
+#+begin_src emacs-lisp
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+#+end_src
+
+Turning on line highlighting, and defining custom color
+
+#+begin_src emacs-lisp
+(global-hl-line-mode 1)
+(set-face-background 'hl-line "azure1")
+#+end_src
+
+* General Settings
+
+Delete text that is selected when copy pasting/typing
+
+#+begin_src emacs-lisp
+(delete-selection-mode 1)
+#+end_src
+
+Enable shift selection
+
+#+begin_src emacs-lisp
+(setq org-support-shift-select t)
+#+end_src
+
+* Org Mode Configuration
+
+** Basic Settings
+
+Associate all org files with org mode
+
+#+begin_src emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
+#+end_src
+
+Make the indentation look nicer
+
+#+begin_src emacs-lisp
+(add-hook 'org-mode-hook 'org-indent-mode)
+#+end_src
+
+Hide the markers so you just see bold text as BOLD-TEXT and not *BOLD-TEXT*
+
+#+begin_src emacs-lisp
+(setq org-hide-emphasis-markers t)
+#+end_src
+
+Wrap the lines in org mode so that things are easier to read
+
+#+begin_src emacs-lisp
+(add-hook 'org-mode-hook 'visual-line-mode)
+#+end_src
+
+Follow the links
+
+#+begin_src emacs-lisp
+(setq org-return-follows-link  t)
+#+end_src
+
+Open current directory in buffer on startup
+
+#+begin_src emacs-lisp
+(find-file ".")
+#+end_src
+
+** Agenda Configuration
+
+Agenda always takes over current window
+
+#+begin_src emacs-lisp
+(setq org-agenda-window-setup 'only-window)
+#+end_src
+
+Shortcuts for viewing the agenda
+
+#+begin_src emacs-lisp
+(define-key global-map "\C-ca" 'org-agenda)
+#+end_src
+
+*** Keybindings
+
+Remap the change priority keys to use the UP or DOWN key
+
+#+begin_src emacs-lisp
+(define-key org-mode-map (kbd "C-c <up>") 'org-priority-up)
+(define-key org-mode-map (kbd "C-c <down>") 'org-priority-down)
+#+end_src
+
+When you want to change the level of an org item, use SMR
+
+#+begin_src emacs-lisp
+(define-key org-mode-map (kbd "C-c C-g C-r") 'org-shiftmetaright)
+#+end_src
+
+** TODO Management
+
+*** TODO States
+
+Todo States - "@" means prompt for a note upon entering the state, "!" means make a timestamp when you enter the state, "/!" means make a timestamp when leaving the state
+
+#+begin_src emacs-lisp
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "WAITING(w@/!)" "|" "DONE(d!)" "CANCELLED(c@!)" )
+        ))
+#+end_src
+
+*** TODO Colors
+
+#+begin_src emacs-lisp
+(setq org-todo-keyword-faces
+      '(
+        ("TODO" . (:foreground "firebrick3" :weight bold))
+        ("WAITING" . (:foreground "DarkOrange2" :weight bold))
+        ("DONE" . (:foreground "forest green" :weight bold))
+        ("CANCELLED" . (:foreground "slate gray" :weight bold))
+        ))
+#+end_src
+
+*** Logging
+
+When a TODO is set to a done state, record a timestamp
+
+#+begin_src emacs-lisp
+(setq org-log-done 'time)
+#+end_src
+
+*** Auto-scheduling on Completion
+
+Automatically schedule tasks for today when marked as DONE or CANCELLED
+
+#+begin_src emacs-lisp
+(defun my/schedule-task-on-completion ()
+  "Schedule task for today when it's marked as DONE or CANCELLED.
+Skip recurring tasks (those with repeaters)."
+  (when (and (member org-state '("DONE" "CANCELLED"))
+             (not (org-get-repeat)))
+    (org-schedule nil (format-time-string "%Y-%m-%d"))))
+
+(add-hook 'org-after-todo-state-change-hook 'my/schedule-task-on-completion)
+#+end_src
+
+** Tags & Colors
+
+Tags
+
+#+begin_src emacs-lisp
+(setq org-tag-alist '(
+                      ;; Contexts
+                      (:startgroup . nil)
+                      ("@work" . ?w)
+                      ("@personal" . ?p)
+                      (:endgroup . nil)
+		      ))
+#+end_src
+
+Tag colors
+
+#+begin_src emacs-lisp
+(setq org-tag-faces
+      '(
+        ("work"  . (:foreground "royalblue1" :weight bold))
+        ("personal"   . (:foreground "sienna"    :weight bold))
+        ))
+#+end_src
+
+** Refile Configuration
+
+Configure refile targets
+
+#+begin_src emacs-lisp
+(setq org-refile-targets '(
+                           ("todo.org" :maxlevel . 3)
+                           ("thoughts.org" :maxlevel . 3)
+                           ("questions.org" :maxlevel . 3)
+                           ("trash.org" :maxlevel . 3)
+                           (org-agenda-files :maxlevel . 3)))
+#+end_src
+
+Allow refile to create parent tasks with confirmation
+
+#+begin_src emacs-lisp
+(setq org-refile-allow-creating-parent-nodes 'confirm)
+#+end_src
+
+Set a specific location for archived tasks
+
+#+begin_src emacs-lisp
+(setq org-archive-location "archive/archive.org::* Archived Tasks")
+#+end_src
+
+** Custom Functions
+
+*** Quick Note Function
+
+Custom function to quickly add notes
+
+#+begin_src emacs-lisp
+(defun quick-note ()
+  "Open notes.org, create a newline, and insert **."
+  (interactive)
+  (find-file "./notes.org")
+  (goto-char (point-max))
+  (insert "\n** "))
+
+(global-set-key (kbd "s-SPC") 'quick-note)
+#+end_src
+
+*** Refile Todos Function
+
+Custom refile function to move todos to todo.org
+
+#+begin_src emacs-lisp
+(defun refile-todos-to-todo-file ()
+  "Refile all TODO items from current buffer to todo.org under 'todos' heading."
+  (interactive)
+  (unless (file-exists-p "todo.org")
+    (error "Target file todo.org not found! Update the path in this function"))
+  (let ((org-refile-targets '(("todo.org" :regexp . "^\\*+ Todos\\>")))
+        (count 0))
+    (save-excursion
+      (while (progn
+               (goto-char (point-min))
+               (re-search-forward "^\\*+ TODO " nil t))
+        (forward-line 0)  ; Ensure we're at headline start
+        (org-refile nil nil (org-refile-get-location))
+        (cl-incf count)))
+    (message "Successfully refiled %d TODO items!" count)))
+
+(global-set-key (kbd "C-c r") 'refile-todos-to-todo-file)
+#+end_src
+
+*** Agenda Prefix Formatting
+
+Custom function to create pipe-based indentation
+
+#+begin_src emacs-lisp
+(defun my/org-agenda-prefix-with-pipes ()
+  "Generate prefix with pipe characters for indentation based on outline level."
+  (let* ((level (org-current-level))
+         (base-level (or (org-get-outline-path t) 1))
+         (indent-level (if level (1- level) 0)))
+    (if (> indent-level 0)
+        (concat (make-string (* indent-level 2) ?\s) "∟")
+      "")))
+#+end_src
+
+Set custom prefix format for agenda views
+
+#+begin_src emacs-lisp
+(setq org-agenda-prefix-format
+      '((agenda . " %i %-12:c%?-12t% s")
+        (todo . " %i %-12:c")
+        (tags . " %i %-12:c%(my/org-agenda-prefix-with-pipes)")
+        (search . " %i %-12:c")))
+#+end_src
+
+** Custom Skip Functions
+
+Custom skip function that checks inherited tags
+
+#+begin_src emacs-lisp
+(defun my/skip-if-has-tag (tag)
+  "Skip entries that have TAG (including inherited tags)."
+  (let ((tags (org-get-tags)))
+    (when (member tag tags)
+      (or (outline-next-heading)
+          (point-max)))))
+
+(defun my/skip-if-has-work-tag ()
+  "Skip entries tagged with @work (including inherited)."
+  (my/skip-if-has-tag "@work"))
+
+(defun my/skip-if-has-personal-tag ()
+  "Skip entries tagged with @personal (including inherited)."
+  (my/skip-if-has-tag "@personal"))
+#+end_src
+
+** Custom Agenda Commands
+
+Custom agendas for work and personal tasks
+
+#+begin_src emacs-lisp
+(setq org-agenda-custom-commands
+      '(("w" "Work Tasks"
+         ((agenda ""
+                  ((org-agenda-skip-function 'my/skip-if-has-personal-tag)))
+          (tags-todo "-@personal"
+                     ((org-agenda-skip-function '(org-agenda-skip-entry-if 'scheduled))))))
+        ("p" "Personal Tasks"
+         ((agenda ""
+                  ((org-agenda-skip-function 'my/skip-if-has-work-tag)))
+          (tags-todo "-@work"
+                     ((org-agenda-skip-function '(org-agenda-skip-entry-if 'scheduled))))))))
+#+end_src
+
+* File Synchronization
+
+** Auto-Save
+
+Auto-save visited files every 10 seconds of idle time
+
+#+begin_src emacs-lisp
+(auto-save-visited-mode 10)
+(setq auto-save-visited-interval 10)  ; Very frequent saves for iCloud sync
+#+end_src
+
+Also save all org buffers after agenda operations
+
+#+begin_src emacs-lisp
+(defun my/save-all-org-buffers (&rest _)
+  "Save all org-mode buffers without prompting."
+  (save-some-buffers t (lambda () (derived-mode-p 'org-mode))))
+
+(add-hook 'org-agenda-after-show-hook #'my/save-all-org-buffers)
+(advice-add 'org-agenda-todo :after #'my/save-all-org-buffers)
+(advice-add 'org-agenda-priority :after #'my/save-all-org-buffers)
+(advice-add 'org-agenda-set-tags :after #'my/save-all-org-buffers)
+(advice-add 'org-agenda-schedule :after #'my/save-all-org-buffers)
+(advice-add 'org-agenda-deadline :after #'my/save-all-org-buffers)
+(advice-add 'org-agenda-refile :after #'my/save-all-org-buffers)
+#+end_src
+
+** Auto-Revert
+
+Enable global auto-revert for all buffers
+
+#+begin_src emacs-lisp
+(global-auto-revert-mode 5)
+#+end_src
+
+Make auto-revert very responsive for org files
+
+#+begin_src emacs-lisp
+(setq auto-revert-interval 5)  ; Check every 5 seconds
+(setq auto-revert-check-vc-info nil)  ; Skip VC checks (i.e. git stuff) for performance
+#+end_src
+
+Also revert non-file buffers like dired
+
+#+begin_src emacs-lisp
+(setq global-auto-revert-non-file-buffers t)
+#+end_src
+
+* Custom Variables
+
+#+begin_src emacs-lisp
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages nil))
+#+end_src

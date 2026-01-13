@@ -1,0 +1,27 @@
+;;; local-config.el.example --- Local configuration template -*- lexical-binding: t -*-
+
+;;; Commentary:
+;; This file contains machine-specific settings that should not be committed to git.
+;;
+;; SETUP INSTRUCTIONS:
+;; 1. Copy this file to local-config.el:
+;;    cp local-config.el.example local-config.el
+;;
+;; 2. Edit local-config.el and update the path to your org-mode files directory
+;;
+;; 3. The local-config.el file is gitignored and will not be committed
+
+;;; Code:
+
+;; Set working directory to your org-mode files location
+;; Update this path to match your system
+(cd "/Users/YOUR-USERNAME/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/")
+
+;; Set org-agenda files
+;; Must do this so the agenda knows where to look for your files
+(setq org-agenda-files '("."
+                         "projects"))
+
+;; Provide feature
+(provide 'local-config)
+;;; local-config.el.example ends here
