@@ -16,6 +16,7 @@ See =local-config.el.example= for an example.
 ** Prerequisites
 - [[https://typeof.net/Iosevka/][Iosevka]] font
 - [[https://github.com/rrthomas/enchant][Enchant]] spellchecker
+- pkg-config - needed for emacs to locate enchant
 
 * Table of Contents :TOC:
 - [[#about][About]]
