@@ -380,7 +380,6 @@ Custom function to create pipe-based indentation
 (defun my/org-agenda-prefix-with-pipes ()
   "Generate prefix with pipe characters for indentation based on outline level."
   (let* ((level (org-current-level))
-         (base-level (or (org-get-outline-path t) 1))
          (indent-level (if level (1- level) 0)))
     (if (> indent-level 0)
         (concat (make-string (* indent-level 2) ?\s) "∟")
