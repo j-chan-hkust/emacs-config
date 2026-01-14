@@ -2,6 +2,11 @@
 #+AUTHOR: jungchan
 #+PROPERTY: header-args :tangle config.el :results silent
 
+* Header
+#+begin_src emacs-lisp
+;;; config.el --- Tangled user configuration -*- lexical-binding: t -*-
+#+end_src
+
 * About
 
 This is a literate Emacs configuration using org-babel-tangle. The configuration is written in org-mode format with embedded code blocks that are "tangled" into an executable =config.el= file.
@@ -93,6 +98,7 @@ Initialize package sources and set up use-package for declarative package manage
 (use-package olivetti
   :bind ("C-c o" . olivetti-mode))
 
+(declare-function olivetti-set-width "olivetti")
 (add-hook 'olivetti-mode-on-hook (lambda () (olivetti-set-width 100)))
 #+end_src
 
@@ -268,6 +274,7 @@ Automatically schedule tasks for today when marked as DONE or CANCELLED
 (defun my/schedule-task-on-completion ()
   "Schedule task for today when it's marked as DONE or CANCELLED.
 Skip recurring tasks (those with repeaters)."
+  (defvar org-state)
   (when (and (member org-state '("DONE" "CANCELLED"))
              (not (org-get-repeat)))
     (org-schedule nil (format-time-string "%Y-%m-%d"))))
@@ -347,7 +354,7 @@ Custom refile function to move todos to todo.org
 
 #+begin_src emacs-lisp
 (defun refile-todos-to-todo-file ()
-  "Refile all TODO items from current buffer to todo.org under 'todos' heading."
+  "Refile all TODO items from current buffer to todo.org under \='todos\=' heading."
   (interactive)
   (unless (file-exists-p "todo.org")
     (error "Target file todo.org not found! Update the path in this function"))
