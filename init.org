@@ -2,15 +2,16 @@
 #+AUTHOR: jungchan
 #+PROPERTY: header-args :tangle config.el :results silent
 
+* About
+This aims to ensure my emacs configuration remains readable and understandable as I continue to throw more and more AI slop at it. Code snippets are collected from the rest of this file, and compiled together into "config.el", which is then run by emacs.
+
+Approach is based off of SophieBosio's example: https://github.com/SophieBosio/.emacs.d
+
 * Header
+
 #+begin_src emacs-lisp
 ;;; config.el --- Tangled user configuration -*- lexical-binding: t -*-
 #+end_src
-
-* About
-
-This is a literate Emacs configuration using org-babel-tangle. The configuration is written in org-mode format with embedded code blocks that are "tangled" into an executable =config.el= file.
-
 * Setup & Tangling
 
 Auto-tangle this file when saving to automatically regenerate =config.el=.
