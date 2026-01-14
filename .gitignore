@@ -8,3 +8,5 @@ elpa/
 local-config.el
 config.el
 *.elc
+conductor/
+.claude/
