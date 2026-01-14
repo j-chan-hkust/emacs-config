@@ -7,4 +7,4 @@ url/*
 elpa/
 local-config.el
 config.el
-config.elc
+*.elc
