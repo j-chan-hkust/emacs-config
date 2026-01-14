@@ -7,6 +7,8 @@ This aims to ensure my emacs configuration remains readable and understandable a
 
 Approach is based off of SophieBosio's example: https://github.com/SophieBosio/.emacs.d
 
+* Table of Contents :TOC:
+
 * Header
 
 #+begin_src emacs-lisp
@@ -58,6 +60,17 @@ Initialize package sources and set up use-package for declarative package manage
 (setq use-package-always-ensure t)
 (use-package org
   :pin gnu)
+#+end_src
+
+** toc-org
+
+#+begin_src emacs-lisp
+(unless (package-installed-p 'toc-org)
+  (package-refresh-contents)
+  (package-install 'toc-org))
+
+(use-package toc-org
+  :hook (org-mode . toc-org-mode))
 #+end_src
 
 ** org-superstar
