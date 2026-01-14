@@ -7,9 +7,49 @@ This aims to ensure my emacs configuration remains readable and understandable a
 
 Approach is based off of SophieBosio's example: https://github.com/SophieBosio/.emacs.d
 
+* Quickstart
+**  Local Configuration
+Sensitive variables like directory path are loaded from the file =local-config.el= in the bootstrap =init.el= file BEFORE this configuration loads. Make sure you set that up first.
+
+See =local-config.el.example= for an example.
+
+** Prerequisites
+- [[https://typeof.net/Iosevka/][Iosevka]] font
+- [[https://github.com/rrthomas/enchant][Enchant]] spellchecker
+
 * Table of Contents :TOC:
+- [[#about][About]]
+- [[#quickstart][Quickstart]]
+  -  [[#local-configuration][Local Configuration]]
+  - [[#prerequisites][Prerequisites]]
+- [[#header][Header]]
+- [[#setup--tangling][Setup & Tangling]]
+- [[#package-management][Package Management]]
+  - [[#toc-org][toc-org]]
+  - [[#org-superstar][org-superstar]]
+  - [[#jinx][jinx]]
+  - [[#olivetti][olivetti]]
+- [[#visuals][Visuals]]
+  - [[#fonts][Fonts]]
+  - [[#org-heading-sizes][Org Heading Sizes]]
+  - [[#window--display][Window & Display]]
+- [[#general-settings][General Settings]]
+- [[#org-mode-configuration][Org Mode Configuration]]
+  - [[#basic-settings][Basic Settings]]
+  - [[#agenda-configuration][Agenda Configuration]]
+  - [[#management][Management]]
+  - [[#tags--colors][Tags & Colors]]
+  - [[#refile-configuration][Refile Configuration]]
+  - [[#custom-functions][Custom Functions]]
+  - [[#custom-skip-functions][Custom Skip Functions]]
+  - [[#custom-agenda-commands][Custom Agenda Commands]]
+- [[#file-synchronization][File Synchronization]]
+  - [[#auto-save][Auto-Save]]
+  - [[#auto-revert][Auto-Revert]]
+- [[#custom-variables][Custom Variables]]
 
 * Header
+A simple header for the config.el file that will be generated, that also declares it in [[https://www.gnu.org/software/emacs/manual/html_node/eintr/Lexical-_0026-Dynamic-Binding-Differences.html][lexical binding]], which makes way more sense to me.
 
 #+begin_src emacs-lisp
 ;;; config.el --- Tangled user configuration -*- lexical-binding: t -*-
@@ -30,12 +70,6 @@ Auto-tangle this file when saving to automatically regenerate =config.el=.
 
 (add-hook 'after-save-hook 'tangle-init)
 #+end_src
-
-* Local Configuration
-
-Machine-specific settings are loaded from =local-config.el= in the bootstrap =init.el= file BEFORE this configuration loads. This ensures the working directory and org-agenda-files are set first.
-
-See =local-config.el.example= for setup instructions.
 
 * Package Management
 
@@ -117,23 +151,16 @@ Initialize package sources and set up use-package for declarative package manage
 #+end_src
 
 * Visuals
-
 ** Fonts
-
-Set default font
 
 #+begin_src emacs-lisp
 (set-face-attribute 'default nil :font "Iosevka-14")
 #+end_src
 
 ** Org Heading Sizes
-
+Custom heading sizes for readability
 #+begin_src emacs-lisp
 (custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
  '(org-level-1 ((t (:inherit outline-1 :height 1.2))))
  '(org-level-2 ((t (:inherit outline-2 :height 1.15))))
  '(org-level-3 ((t (:inherit outline-3 :height 1.1))))
