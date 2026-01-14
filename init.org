@@ -46,7 +46,6 @@ See =local-config.el.example= for an example.
 - [[#file-synchronization][File Synchronization]]
   - [[#auto-save][Auto-Save]]
   - [[#auto-revert][Auto-Revert]]
-- [[#custom-variables][Custom Variables]]
 
 * Header
 A simple header for the config.el file that will be generated, that also declares it in [[https://www.gnu.org/software/emacs/manual/html_node/eintr/Lexical-_0026-Dynamic-Binding-Differences.html][lexical binding]], which makes way more sense to me.
@@ -152,12 +151,12 @@ Initialize package sources and set up use-package for declarative package manage
 
 * Visuals
 ** Fonts
-
 #+begin_src emacs-lisp
 (set-face-attribute 'default nil :font "Iosevka-14")
 #+end_src
 
 ** Org Heading Sizes
+
 Custom heading sizes for readability
 #+begin_src emacs-lisp
 (custom-set-faces
@@ -171,13 +170,11 @@ Custom heading sizes for readability
 ** Window & Display
 
 Open emacs in full screen
-
 #+begin_src emacs-lisp
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 #+end_src
 
 Turning on line highlighting, and defining custom color
-
 #+begin_src emacs-lisp
 (global-hl-line-mode 1)
 (set-face-background 'hl-line "azure1")
@@ -185,8 +182,7 @@ Turning on line highlighting, and defining custom color
 
 * General Settings
 
-Delete text that is selected when copy pasting/typing
-
+Delete selected text when pasting/typing (i.e. modern UX)
 #+begin_src emacs-lisp
 (delete-selection-mode 1)
 #+end_src
@@ -207,32 +203,27 @@ Associate all org files with org mode
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 #+end_src
 
-Make the indentation look nicer
-
+Make header child content indentation match the parents indentation
 #+begin_src emacs-lisp
 (add-hook 'org-mode-hook 'org-indent-mode)
 #+end_src
 
 Hide the markers so you just see bold text as BOLD-TEXT and not *BOLD-TEXT*
-
 #+begin_src emacs-lisp
 (setq org-hide-emphasis-markers t)
 #+end_src
 
 Wrap the lines in org mode so that things are easier to read
-
 #+begin_src emacs-lisp
 (add-hook 'org-mode-hook 'visual-line-mode)
 #+end_src
 
 Follow the links
-
 #+begin_src emacs-lisp
 (setq org-return-follows-link  t)
 #+end_src
 
 Open current directory in buffer on startup
-
 #+begin_src emacs-lisp
 (when (boundp 'user-org-directory)
   (cd user-org-directory))
@@ -242,20 +233,17 @@ Open current directory in buffer on startup
 ** Agenda Configuration
 
 Agenda always takes over current window
-
 #+begin_src emacs-lisp
 (setq org-agenda-window-setup 'only-window)
 #+end_src
 
-*** Agenda Files
-
+Also allow agenda to see files in the projects directory
 #+begin_src emacs-lisp
 (setq org-agenda-files '("."
                          "projects"))
 #+end_src
 
 Shortcuts for viewing the agenda
-
 #+begin_src emacs-lisp
 (define-key global-map "\C-ca" 'org-agenda)
 #+end_src
@@ -263,14 +251,12 @@ Shortcuts for viewing the agenda
 *** Keybindings
 
 Remap the change priority keys to use the UP or DOWN key
-
 #+begin_src emacs-lisp
 (define-key org-mode-map (kbd "C-c <up>") 'org-priority-up)
 (define-key org-mode-map (kbd "C-c <down>") 'org-priority-down)
 #+end_src
 
 When you want to change the level of an org item, use SMR
-
 #+begin_src emacs-lisp
 (define-key org-mode-map (kbd "C-c C-g C-r") 'org-shiftmetaright)
 #+end_src
@@ -326,7 +312,7 @@ Skip recurring tasks (those with repeaters)."
 ** Tags & Colors
 
 Tags
-
+ 
 #+begin_src emacs-lisp
 (setq org-tag-alist '(
                       ;; Contexts
@@ -337,7 +323,7 @@ Tags
 		      ))
 #+end_src
 
-Tag colors
+Tag colors TODO - this is working as intended right now
 
 #+begin_src emacs-lisp
 (setq org-tag-faces
@@ -415,7 +401,7 @@ Custom refile function to move todos to todo.org
 
 *** Agenda Prefix Formatting
 
-Custom function to create pipe-based indentation
+Custom function to create pipe-based indentation TODO: add example image
 
 #+begin_src emacs-lisp
 (defun my/org-agenda-prefix-with-pipes ()
@@ -505,7 +491,7 @@ Also save all org buffers after agenda operations
 
 ** Auto-Revert
 
-Enable global auto-revert for all buffers
+Automatically reloads file every 5 seconds
 
 #+begin_src emacs-lisp
 (global-auto-revert-mode 5)
@@ -522,15 +508,4 @@ Also revert non-file buffers like dired
 
 #+begin_src emacs-lisp
 (setq global-auto-revert-non-file-buffers t)
-#+end_src
-
-* Custom Variables
-
-#+begin_src emacs-lisp
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages nil))
 #+end_src
