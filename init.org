@@ -198,6 +198,13 @@ Agenda always takes over current window
 (setq org-agenda-window-setup 'only-window)
 #+end_src
 
+*** Agenda Files
+
+#+begin_src emacs-lisp
+(setq org-agenda-files '("."
+                         "projects"))
+#+end_src
+
 Shortcuts for viewing the agenda
 
 #+begin_src emacs-lisp

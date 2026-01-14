@@ -17,11 +17,6 @@
 ;; Update this path to match your system
 (cd "/Users/YOUR-USERNAME/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/")
 
-;; Set org-agenda files
-;; Must do this so the agenda knows where to look for your files
-(setq org-agenda-files '("."
-                         "projects"))
-
 ;; Provide feature
 (provide 'local-config)
 ;;; local-config.el.example ends here
