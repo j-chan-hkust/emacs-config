@@ -187,6 +187,8 @@ Follow the links
 Open current directory in buffer on startup
 
 #+begin_src emacs-lisp
+(when (boundp 'user-org-directory)
+  (cd user-org-directory))
 (find-file ".")
 #+end_src
 

@@ -7,15 +7,15 @@
 ;; 1. Copy this file to local-config.el:
 ;;    cp local-config.el.example local-config.el
 ;;
-;; 2. Edit local-config.el and update the path to your org-mode files directory
+;; 2. Edit local-config.el and set the `user-org-directory` variable
 ;;
 ;; 3. The local-config.el file is gitignored and will not be committed
 
 ;;; Code:
 
-;; Set working directory to your org-mode files location
+;; Define the location of your org-mode files
 ;; Update this path to match your system
-(cd "/Users/YOUR-USERNAME/Library/Mobile Documents/iCloud~md~obsidian/Documents/org-mode/org/")
+(defvar user-org-directory "/Users/YOUR-USERNAME/Documents/org/")
 
 ;; Provide feature
 (provide 'local-config)
