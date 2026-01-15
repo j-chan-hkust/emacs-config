@@ -369,7 +369,7 @@ Custom function to quickly add notes
 (defun quick-note ()
   "Open notes.org, create a newline, and insert **."
   (interactive)
-  (find-file "./notes.org")
+  (find-file (concat (file-name-as-directory user-org-directory) "notes.org"))
   (goto-char (point-max))
   (insert "\n** "))
 
