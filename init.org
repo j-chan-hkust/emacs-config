@@ -382,20 +382,26 @@ Custom refile function to move todos to todo.org
 
 #+begin_src emacs-lisp
 (defun refile-todos-to-todo-file ()
-  "Refile all TODO items from current buffer to todo.org under \='todos\=' heading."
+  "Refile all items with any TODO state from current buffer to todo.org under 'Todos' heading."
   (interactive)
-  (unless (file-exists-p "todo.org")
-    (error "Target file todo.org not found! Update the path in this function"))
-  (let ((org-refile-targets '(("todo.org" :regexp . "^\\*+ Todos\\>")))
-        (count 0))
-    (save-excursion
-      (while (progn
-               (goto-char (point-min))
-               (re-search-forward "^\\*+ TODO " nil t))
-        (forward-line 0)  ; Ensure we're at headline start
-        (org-refile nil nil (org-refile-get-location))
-        (cl-incf count)))
-    (message "Successfully refiled %d TODO items!" count)))
+  (let* ((target-file (concat (file-name-as-directory user-org-directory) "todo.org"))
+         (org-refile-targets `((,target-file :regexp . "^\\*+ Todos\\>")))
+         (count 0))
+    (unless (file-exists-p target-file)
+      (error "Target file %s not found!" target-file))
+    
+    (let ((target-loc (car (org-refile-get-targets))))
+      (unless target-loc
+        (error "Target heading 'Todos' not found in %s" target-file))
+      
+      (save-excursion
+        (while (progn
+                 (goto-char (point-min))
+                 (re-search-forward "^\\*+ \\(TODO\\|WAITING\\|DONE\\|CANCELLED\\) " nil t))
+          (forward-line 0)  ; Ensure we're at headline start
+          (org-refile nil nil target-loc)
+          (cl-incf count))))
+    (message "Successfully refiled %d items!" count)))
 
 (global-set-key (kbd "C-c r") 'refile-todos-to-todo-file)
 #+end_src
