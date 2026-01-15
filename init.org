@@ -406,6 +406,32 @@ Custom refile function to move todos to todo.org
 (global-set-key (kbd "C-c r") 'refile-todos-to-todo-file)
 #+end_src
 
+*** Projects Directory
+
+Open the projects directory in a new window, filtering for .org files.
+
+#+begin_src emacs-lisp
+(defun my/open-projects-dired ()
+  "Open the projects directory in a new window, showing ONLY .org files."
+  (interactive)
+  (let* ((projects-dir (expand-file-name "projects" user-org-directory))
+         ;; Get list of .org files relative to projects-dir
+         (org-files (directory-files projects-dir nil "\\.org$"))
+         ;; Construct the list expected by dired: (dir file1 file2 ...)
+         (dired-list (cons projects-dir org-files)))
+    
+    ;; Create the window first
+    (select-window (split-window-sensibly))
+    
+    ;; Open dired with the explicit list of files
+    (dired dired-list)
+    
+    ;; Hide details for a cleaner view
+    (dired-hide-details-mode 1)))
+
+(global-set-key (kbd "C-c p") 'my/open-projects-dired)
+#+end_src
+
 *** Agenda Prefix Formatting
 
 Custom function to create pipe-based indentation TODO: add example image
