@@ -411,23 +411,23 @@ Custom refile function to move todos to todo.org
 Open the projects directory in a new window, filtering for .org files.
 
 #+begin_src emacs-lisp
+(defun my/dired-open-and-close ()
+  "Open selected file in new window, close dired."
+  (interactive)
+  (let ((dired-buf (current-buffer)))
+    (dired-find-file-other-window)
+    (kill-buffer dired-buf)))
+
 (defun my/open-projects-dired ()
-  "Open the projects directory in a new window, showing ONLY .org files."
+  "Show .org files from projects directory in dired."
   (interactive)
   (let* ((projects-dir (expand-file-name "projects" user-org-directory))
-         ;; Get list of .org files relative to projects-dir
          (org-files (directory-files projects-dir nil "\\.org$"))
-         ;; Construct the list expected by dired: (dir file1 file2 ...)
-         (dired-list (cons projects-dir org-files)))
-    
-    ;; Create the window first
-    (select-window (split-window-sensibly))
-    
-    ;; Open dired with the explicit list of files
-    (dired dired-list)
-    
-    ;; Hide details for a cleaner view
-    (dired-hide-details-mode 1)))
+         (new-window (split-window-sensibly)))
+    (when new-window (select-window new-window))
+    (dired (cons projects-dir org-files))
+    (dired-hide-details-mode 1)
+    (local-set-key (kbd "RET") 'my/dired-open-and-close)))
 
 (global-set-key (kbd "C-c p") 'my/open-projects-dired)
 #+end_src
