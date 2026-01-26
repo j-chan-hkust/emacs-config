@@ -412,11 +412,12 @@ Open the projects directory in a new window, filtering for .org files.
 
 #+begin_src emacs-lisp
 (defun my/dired-open-and-close ()
-  "Open selected file in new window, close dired."
+  "Open selected file in new frame, close dired window."
   (interactive)
-  (let ((dired-buf (current-buffer)))
-    (dired-find-file-other-window)
-    (kill-buffer dired-buf)))
+  (let ((file (dired-get-file-for-visit))
+        (dired-window (selected-window)))
+    (find-file-other-frame file)
+    (delete-window dired-window)))
 
 (defun my/open-projects-dired ()
   "Show .org files from projects directory in dired."
