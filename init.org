@@ -382,7 +382,7 @@ Custom refile function to move todos to todo.org
 
 #+begin_src emacs-lisp
 (defun refile-todos-to-todo-file ()
-  "Refile all items with any TODO state from current buffer to todo.org under 'Todos' heading."
+  "Refile all TODO items from current buffer to `Todos' heading in todo.org."
   (interactive)
   (let* ((target-file (concat (file-name-as-directory user-org-directory) "todo.org"))
          (org-refile-targets `((,target-file :regexp . "^\\*+ Todos\\>")))
@@ -438,7 +438,7 @@ Custom function to create pipe-based indentation TODO: add example image
 
 #+begin_src emacs-lisp
 (defun my/org-agenda-prefix-with-pipes ()
-  "Generate prefix with pipe characters for indentation based on outline level."
+  "Generate prefix with pipes for indentation based on outline level."
   (let* ((level (org-current-level))
          (indent-level (if level (1- level) 0)))
     (if (> indent-level 0)
