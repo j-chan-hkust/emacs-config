@@ -406,6 +406,23 @@ Custom refile function to move todos to todo.org
 (global-set-key (kbd "C-c r") 'refile-todos-to-todo-file)
 #+end_src
 
+*** Meeting Capture Template
+
+Custom capture template for meetings
+
+#+begin_src emacs-lisp
+(define-key global-map "\C-cc" 'org-capture)
+
+(setq org-capture-templates
+      `(    
+        ("m" "Meeting"
+         entry (file+datetree ,(concat (file-name-as-directory user-org-directory) "meetings.org"))
+         "* %? :meeting:%^g \n:Created: %T\n** Attendees\n*** \n** To Review\n** Notes\n** Action Items\n*** TODO "
+         :tree-type week
+         :empty-lines 0)
+        ))
+#+end_src
+
 *** Projects Directory
 
 Open the projects directory in a new window, filtering for .org files.
