@@ -240,8 +240,8 @@ Agenda always takes over current window
 
 Also allow agenda to see files in the projects directory
 #+begin_src emacs-lisp
-(setq org-agenda-files '("."
-                         "projects"))
+(setq org-agenda-files (list user-org-directory
+                              (expand-file-name "projects" user-org-directory)))
 #+end_src
 
 Shortcuts for viewing the agenda
