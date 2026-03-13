@@ -412,42 +412,66 @@ What this does is it ensures what is seen in agenda view closely mirrors the act
      ((member "@personal" tags) "Personal Todos")
      (t nil))))
 
-(defun my/org-move-entries-by-state (source-file state target-file target-heading)
-  "Move entries with STATE from SOURCE-FILE to TARGET-HEADING in TARGET-FILE."
-  (let ((target-loc (my/org-refile-target-location target-file target-heading))
-        (count 0))
-    (with-current-buffer (find-file-noselect source-file)
-      (save-excursion
-        (while (progn
-                 (goto-char (point-min))
-                 (re-search-forward (format "^\\*+ %s\\>" (regexp-quote state)) nil t))
-          (forward-line 0)
-          (org-refile nil nil target-loc)
-          (cl-incf count)))
-      (save-buffer))
-    count))
+(defun my/org-goto-heading (file heading)
+  "Move point to HEADING in FILE and return point."
+  (with-current-buffer (find-file-noselect file)
+    (save-excursion
+      (goto-char (point-min))
+      (unless (re-search-forward (format "^\\*+ %s\\>" (regexp-quote heading)) nil t)
+        (error "Target heading '%s' not found in %s" heading file))
+      (goto-char (match-beginning 0))
+      (point))))
 
-(defun my/org-route-tagged-todos (file)
-  "Route tagged active TODO items in FILE to their destination headings."
-  (let ((work-loc (my/org-refile-target-location file "Work Todos"))
-        (personal-loc (my/org-refile-target-location file "Personal Todos"))
-        (count 0))
-    (with-current-buffer (find-file-noselect file)
+(defun my/org-process-refiled-todos (todo-file closed-file)
+  "Process direct children under `Todos' in TODO-FILE."
+  (let ((completed-count 0)
+        (cancelled-count 0)
+        (tagged-count 0))
+    (with-current-buffer (find-file-noselect todo-file)
       (save-excursion
-        (while (progn
-                 (goto-char (point-min))
-                 (re-search-forward "^\\*+ \\(TODO\\|WAITING\\)\\>" nil t))
-          (forward-line 0)
-          (let ((target-heading (my/org-route-target-heading)))
-            (when (and target-heading
-                       (not (equal (my/org-top-level-heading) target-heading)))
-              (org-refile nil nil
-                          (if (equal target-heading "Work Todos")
-                              work-loc
-                            personal-loc))
-              (cl-incf count)))))
+        (let ((search-pos (save-excursion
+                            (goto-char (my/org-goto-heading todo-file "Todos"))
+                            (forward-line 1)
+                            (point))))
+        (catch 'done
+          (while t
+            (goto-char (my/org-goto-heading todo-file "Todos"))
+            (let* ((todos-level (org-outline-level))
+                   (subtree-end (save-excursion (org-end-of-subtree t t))))
+              (goto-char search-pos)
+              (while (and (< (point) subtree-end)
+                          (or (not (org-at-heading-p))
+                              (/= (org-outline-level) (1+ todos-level))))
+                (goto-char (or (outline-next-heading) subtree-end)))
+              (when (>= (point) subtree-end)
+                (throw 'done t))
+              (org-back-to-heading t)
+              (let* ((resume-pos (save-excursion (org-end-of-subtree t t)))
+                     (state (org-get-todo-state))
+                     (target-heading
+                      (cond
+                       ((string= state "DONE") "Done")
+                       ((string= state "CANCELLED") "Cancelled")
+                       ((member state '("TODO" "WAITING")) (my/org-route-target-heading))
+                       (t nil))))
+                (if (null target-heading)
+                    (setq search-pos resume-pos)
+                  (org-refile nil nil
+                              (my/org-refile-target-location
+                               (if (member state '("DONE" "CANCELLED"))
+                                   closed-file
+                                 todo-file)
+                               target-heading))
+                  (setq search-pos (save-excursion
+                                     (goto-char (my/org-goto-heading todo-file "Todos"))
+                                     (forward-line 1)
+                                     (point)))
+                  (pcase state
+                    ("DONE" (cl-incf completed-count))
+                    ("CANCELLED" (cl-incf cancelled-count))
+                    (_ (cl-incf tagged-count))))))))))
       (save-buffer))
-    count))
+    (list completed-count cancelled-count tagged-count)))
 
 (defun refile-todos-to-todo-file ()
   "Refile todos to todo.org, then sort closed and tagged items."
@@ -464,9 +488,8 @@ What this does is it ensures what is seen in agenda view closely mirrors the act
         (org-refile nil nil target-loc)
         (cl-incf refiled-count)))
     (save-buffer)
-    (let ((completed-count (my/org-move-entries-by-state todo-file "DONE" closed-file "Done"))
-          (cancelled-count (my/org-move-entries-by-state todo-file "CANCELLED" closed-file "Cancelled"))
-          (tagged-count (my/org-route-tagged-todos todo-file)))
+    (pcase-let ((`(,completed-count ,cancelled-count ,tagged-count)
+                 (my/org-process-refiled-todos todo-file closed-file)))
       (message
        "Refiled %d items; moved %d completed, %d cancelled, and routed %d tagged todos."
        refiled-count completed-count cancelled-count tagged-count))))
