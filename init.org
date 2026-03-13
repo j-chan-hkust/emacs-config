@@ -378,30 +378,98 @@ Custom function to quickly add notes
 
 *** Refile Todos Function
 
-Custom refile function to move todos to todo.org
+Custom refile function to move todos to the right structure. The function does the following:
+- move all todos to todo.org
+- move all closed todos ("DONE", "CANCELLED") to the right location in the closed.org file
+- move all tagged todo items to the appropriate subheader
+
+What this does is it ensures what is seen in agenda view closely mirrors the actual strucuture of todo items in other views, and makes them easier to work with
 
 #+begin_src emacs-lisp
-(defun refile-todos-to-todo-file ()
-  "Refile all TODO items from current buffer to `Todos' heading in todo.org."
-  (interactive)
-  (let* ((target-file (concat (file-name-as-directory user-org-directory) "todo.org"))
-         (org-refile-targets `((,target-file :regexp . "^\\*+ Todos\\>")))
-         (count 0))
-    (unless (file-exists-p target-file)
-      (error "Target file %s not found!" target-file))
-    
-    (let ((target-loc (car (org-refile-get-targets))))
+(defun my/org-refile-target-location (file heading)
+  "Return the refile location for HEADING in FILE."
+  (unless (file-exists-p file)
+    (error "Target file %s not found!" file))
+  (with-current-buffer (find-file-noselect file)
+    (let* ((org-refile-targets `((,file :regexp . ,(format "^\\*+ %s\\>" (regexp-quote heading)))))
+           (target-loc (car (org-refile-get-targets))))
       (unless target-loc
-        (error "Target heading 'Todos' not found in %s" target-file))
-      
+        (error "Target heading '%s' not found in %s" heading file))
+      target-loc)))
+
+(defun my/org-top-level-heading ()
+  "Return the current heading's top-level ancestor."
+  (save-excursion
+    (org-back-to-heading t)
+    (while (org-up-heading-safe))
+    (org-get-heading t t t t)))
+
+(defun my/org-route-target-heading ()
+  "Return the destination heading for the current entry's tags."
+  (let ((tags (org-get-tags)))
+    (cond
+     ((member "@work" tags) "Work Todos")
+     ((member "@personal" tags) "Personal Todos")
+     (t nil))))
+
+(defun my/org-move-entries-by-state (source-file state target-file target-heading)
+  "Move entries with STATE from SOURCE-FILE to TARGET-HEADING in TARGET-FILE."
+  (let ((target-loc (my/org-refile-target-location target-file target-heading))
+        (count 0))
+    (with-current-buffer (find-file-noselect source-file)
       (save-excursion
         (while (progn
                  (goto-char (point-min))
-                 (re-search-forward "^\\*+ \\(TODO\\|WAITING\\|DONE\\|CANCELLED\\) " nil t))
-          (forward-line 0)  ; Ensure we're at headline start
+                 (re-search-forward (format "^\\*+ %s\\>" (regexp-quote state)) nil t))
+          (forward-line 0)
           (org-refile nil nil target-loc)
-          (cl-incf count))))
-    (message "Successfully refiled %d items!" count)))
+          (cl-incf count)))
+      (save-buffer))
+    count))
+
+(defun my/org-route-tagged-todos (file)
+  "Route tagged active TODO items in FILE to their destination headings."
+  (let ((work-loc (my/org-refile-target-location file "Work Todos"))
+        (personal-loc (my/org-refile-target-location file "Personal Todos"))
+        (count 0))
+    (with-current-buffer (find-file-noselect file)
+      (save-excursion
+        (while (progn
+                 (goto-char (point-min))
+                 (re-search-forward "^\\*+ \\(TODO\\|WAITING\\)\\>" nil t))
+          (forward-line 0)
+          (let ((target-heading (my/org-route-target-heading)))
+            (when (and target-heading
+                       (not (equal (my/org-top-level-heading) target-heading)))
+              (org-refile nil nil
+                          (if (equal target-heading "Work Todos")
+                              work-loc
+                            personal-loc))
+              (cl-incf count)))))
+      (save-buffer))
+    count))
+
+(defun refile-todos-to-todo-file ()
+  "Refile todos to todo.org, then sort closed and tagged items."
+  (interactive)
+  (let* ((todo-file (concat (file-name-as-directory user-org-directory) "todo.org"))
+         (closed-file (concat (file-name-as-directory user-org-directory) "closed.org"))
+         (target-loc (my/org-refile-target-location todo-file "Todos"))
+         (refiled-count 0))
+    (save-excursion
+      (while (progn
+               (goto-char (point-min))
+               (re-search-forward "^\\*+ \\(TODO\\|WAITING\\|DONE\\|CANCELLED\\)\\>" nil t))
+        (forward-line 0)
+        (org-refile nil nil target-loc)
+        (cl-incf refiled-count)))
+    (save-buffer)
+    (let ((completed-count (my/org-move-entries-by-state todo-file "DONE" closed-file "Done"))
+          (cancelled-count (my/org-move-entries-by-state todo-file "CANCELLED" closed-file "Cancelled"))
+          (tagged-count (my/org-route-tagged-todos todo-file)))
+      (message
+       "Refiled %d items; moved %d completed, %d cancelled, and routed %d tagged todos."
+       refiled-count completed-count cancelled-count tagged-count))))
 
 (global-set-key (kbd "C-c r") 'refile-todos-to-todo-file)
 #+end_src
