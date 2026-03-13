@@ -10,3 +10,4 @@ config.el
 *.elc
 conductor/
 .claude/
+\#init.org\#
