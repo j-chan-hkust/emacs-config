@@ -40,6 +40,7 @@ See =local-config.el.example= for an example.
   - [[#agenda-configuration][Agenda Configuration]]
   - [[#management][Management]]
   - [[#tags--colors][Tags & Colors]]
+  - [[#priority-levels][Priority Levels]]
   - [[#refile-configuration][Refile Configuration]]
   - [[#custom-functions][Custom Functions]]
   - [[#custom-skip-functions][Custom Skip Functions]]
@@ -332,6 +333,16 @@ Tag colors TODO - this is working as intended right now
         ("work"  . (:foreground "royalblue1" :weight bold))
         ("personal"   . (:foreground "sienna"    :weight bold))
         ))
+#+end_src
+
+** Priority Levels
+
+Define only a single priority level - items are only ever "Prioritized", or Prioritized and Waiting (i.e. on hold)
+
+#+begin_src emacs-lisp
+(setq org-priority-highest ?P
+      org-priority-lowest ?P
+      org-priority-default ?P)
 #+end_src
 
 ** Refile Configuration
