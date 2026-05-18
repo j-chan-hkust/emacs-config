@@ -337,7 +337,7 @@ Tag colors TODO - this is working as intended right now
 
 ** Priority Levels
 
-Define only a single priority level - items are only ever "Prioritized", or Prioritized and Waiting (i.e. on hold)
+Define only a single priority level - items are only ever "Prioritized", or Prioritized and Waiting (i.e. on hold). We need to override the priority function, because the default priority (our only priority) would only give a value of 0. Now, the default priority (or indeed, any priority) gives a value of 1000.
 
 #+begin_src emacs-lisp
   (setq org-priority-highest ?P
@@ -610,7 +610,7 @@ Custom skip function that checks inherited tags
 
 ** Custom Agenda Commands
 
-Custom agendas for work and personal tasks
+Custom agendas for work and personal tasks. Sorting strategy for each has been tweaked to increase priority cookie to the top of the list.
 
 #+begin_src emacs-lisp
 (setq org-agenda-custom-commands
