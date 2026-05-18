@@ -340,9 +340,13 @@ Tag colors TODO - this is working as intended right now
 Define only a single priority level - items are only ever "Prioritized", or Prioritized and Waiting (i.e. on hold)
 
 #+begin_src emacs-lisp
-(setq org-priority-highest ?P
-      org-priority-lowest ?P
-      org-priority-default ?P)
+  (setq org-priority-highest ?P
+        org-priority-lowest ?P
+        org-priority-default ?P)
+
+  (setq org-priority-get-priority-function
+        (lambda (s)
+  	(if (string-match-p org-priority-regexp s) 1000 0)))
 #+end_src
 
 ** Refile Configuration
@@ -394,7 +398,7 @@ Custom refile function to normalize inbox items into the managed todo files. The
 - scans all level-2 entries in =todo.org= and moves =DONE= or =CANCELLED= items into =closed.org=
 - keeps active level-2 entries under their canonical section: =@work= under =Work Todos=, =@personal= under =Personal Todos=, and untagged items under =Todos=
 
-This keeps agenda capture buffers lightweight while preserving a predictable structure in the managed todo files. Run it from an inbox Org buffer, not from =todo.org= or =closed.org=.
+This keeps agendaf capture buffers lightweight while preserving a predictable structure in the managed todo files. Run it from an inbox Org buffer, not from =todo.org= or =closed.org=.
 
 #+begin_src emacs-lisp
 (defun my/org-refile-target-location (file heading)
@@ -612,14 +616,18 @@ Custom agendas for work and personal tasks
 (setq org-agenda-custom-commands
       '(("w" "Work Tasks"
          ((agenda ""
-                  ((org-agenda-skip-function 'my/skip-if-has-personal-tag)))
+                  ((org-agenda-skip-function 'my/skip-if-has-personal-tag)
+                   (org-agenda-sorting-strategy '(priority-down time-up category-keep))))
           (tags-todo "-@personal"
-                     ((org-agenda-skip-function '(org-agenda-skip-entry-if 'scheduled))))))
+                     ((org-agenda-skip-function '(org-agenda-skip-entry-if 'scheduled))
+                      (org-agenda-sorting-strategy '(priority-down category-keep))))))
         ("p" "Personal Tasks"
          ((agenda ""
-                  ((org-agenda-skip-function 'my/skip-if-has-work-tag)))
+                  ((org-agenda-skip-function 'my/skip-if-has-work-tag)
+                   (org-agenda-sorting-strategy '(priority-down time-up category-keep))))
           (tags-todo "-@work"
-                     ((org-agenda-skip-function '(org-agenda-skip-entry-if 'scheduled))))))))
+                     ((org-agenda-skip-function '(org-agenda-skip-entry-if 'scheduled))
+                      (org-agenda-sorting-strategy '(priority-down category-keep))))))))
 #+end_src
 
 * File Synchronization
