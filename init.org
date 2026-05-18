@@ -14,9 +14,9 @@ Sensitive variables like directory path are loaded from the file =local-config.e
 See =local-config.el.example= for an example.
 
 ** Prerequisites
-- [[https://typeof.net/Iosevka/][Iosevka]] font
-- [[https://github.com/rrthomas/enchant][Enchant]] spellchecker
-- pkg-config - needed for emacs to locate enchant
+- [[https://typeof.net/Iosevka/][Iosevka]] font (download the font package, then double-click to install)
+- pkg-config - needed for emacs to locate enchant (install using brew)
+- [[https://github.com/rrthomas/enchant][Enchant]] spellchecker (download the tarball from release, follow the instructions in INSTALL)
 
 * Table of Contents :TOC:
 - [[#about][About]]
