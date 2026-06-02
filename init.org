@@ -239,6 +239,11 @@ Agenda always takes over current window
 (setq org-agenda-window-setup 'only-window)
 #+end_src
 
+When opening an agenda item, immediately run narrow to subtree (so that agenda items open in focused view)
+#+begin_src emacs-lisp
+(add-hook 'org-agenda-after-show-hook #'org-narrow-to-subtree)
+#+end_src
+
 Also allow agenda to see files in the projects directory
 #+begin_src emacs-lisp
 (setq org-agenda-files (list user-org-directory
