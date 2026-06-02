@@ -391,7 +391,9 @@ Custom function to quickly add notes
   (interactive)
   (find-file (concat (file-name-as-directory user-org-directory) "notes.org"))
   (goto-char (point-max))
-  (insert "\n** "))
+  (unless (eq (char-before) ?\n)
+    (insert "\n"))
+  (insert "** "))
 
 (global-set-key (kbd "s-SPC") 'quick-note)
 #+end_src
